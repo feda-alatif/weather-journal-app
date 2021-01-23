@@ -15,7 +15,7 @@ app.use('/', routes);
 app.use(cors());
 
 
-app.use(express.static('website'));
+app.use(express.static('project/website'));
 
 
 
