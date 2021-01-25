@@ -1,27 +1,39 @@
+
+
 const express = require('express');
-const cors = require('cors');
-
-
-const routes = require('./routes');
-
-
 const app = express();
 
+const bodyParser = require('body-parser');
 
-app.use('/', routes);
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
 
-
-
+const cors = require('cors');
 app.use(cors());
 
-
-app.use(express.static('project/website'));
-
+app.use(express.static('website'));
 
 
-const PORT = 3000;
-const serverCallback = () => {
-    console.log(`Server started. Listening on port ${PORT}`);
-}
+const port = 8000;
 
-app.listen(PORT, serverCallback);
+const server = app.listen(port, listening);
+
+function listening() {
+    console.log('server running');
+    console.log(`running on localhost: ${port}`);
+};
+
+
+app.get('/data', (req, res) => {
+    console.log('GET request received');
+    res.send(projectData);
+});
+
+
+app.post('/', (req, res) => {
+    projectData.date = req.body.date;
+    projectData.temperature = req.body.main.temp;
+    projectData.feelings = req.body.feelings;
+    console.log('POST request received');
+    res.end();
+});
