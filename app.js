@@ -1,144 +1,96 @@
-const model = {
-    inputSelectors: ['#zip', '#feelings'],
-    origin: window.location.origin,
-    weatherPath: '/weather',
-    postPath: '/postdata'
-};
+onst FAPIKey = "jq4JXgGeqxzcyBk78hZrin30VIKE2f9GNp05Xbm7";
+const URL = "https://api.nasa.gov/planetary/apod?api_key=jq4JXgGeqxzcyBk78hZrin30VIKE2f9GNp05Xbm7" + FAPIKey;
+const BBUrl = "http://localhost:8000"
 
-const octopus = {
-    init: () => {
-        view.init();
-    },
 
-    getWeatherPath: () => model.weatherPath,
-
-    getPostPath: () => model.postPath,
-
-    generateNewDatetime: () => {
-       
-        let d = new Date();
-        const hrs = d.getHours();
-        const mins = d.getMinutes();
-        const hrsFormatted = hrs < 10 ? '0' + hrs : hrs;
-        const minsFormatted = mins < 10 ? '0' + mins : mins;
-
-        return `${d.getMonth()+1}.${d.getDate()}.${d.getFullYear()} - ${hrsFormatted}:${minsFormatted}`;
-    },
-
-    getInputSelectors: () => {
-        return model.inputSelectors;
-    },
-
-    getWeatherData: async (path = '') => {
-        const response = await fetch(model.origin + path);
-        try {
-            const data = await response.json();
-            return data;
-        } catch (error) {
-            console.log('error: ', error);
-            return error;
-        }
-    },
-
-    postData: async (path = '', data = {}) => {
-     
-        const response = await fetch(model.origin + path, {
-            method: 'POST',
-            credentials: 'same-origin',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(data),
-        });
-
-        try {
-            const newData = await response.json();
-            return newData;
-        } catch (error) {
-            return error;
-        }
-    }
+function getCCD() {  
+  let d = new Date();
+  return d.getMonth()+'.'+ d.getDate()+'.'+ d.getFullYear();
 }
 
-const view = {
-    
-    init: () => {
-       
-        document.addEventListener('DOMContentLoaded', () => {
-            view.addEventListeners();
-        })
-    },
+function getruu() {
+    const ent = document.getElementById('feelings');
+  
+    return ent.value
+  }
 
-    
-    getUserInputs: (selectors = [], reset = false) => {
-        let inputs = {};
-        
-        const regex = new RegExp('^(#|.)');
-        for (let selector of selectors) {
-            const domEle = document.querySelector(selector);
-            inputs[selector.replace(regex, '')] = domEle.value.trim();
-            if(reset) {
-                domEle.value = '';
-            }
-        }
-        return inputs;
-    },
-
-    updateUI: (data) => {
-        const date = octopus.generateNewDatetime();
-        document.querySelector('#date').textContent = date;
-        if (data && data.weather) {
-            document.querySelector('#summary').textContent = 
-                data.weather.weather[0].description || 'N/A';
-            document.querySelector('#temp').textContent = 
-                (data.weather.main.temp - 273.15).toFixed(2) + '°C';
-            document.querySelector('#rh').textContent = 
-                data.weather.main.humidity + '%';
-            document.querySelector('#pressure').textContent = 
-                data.weather.main.pressure + ' mbar';
-            document.querySelector('#content').textContent = 
-                data.feelings;
-        }
-    },
-
-    showFeedback: (message, type) => {
-        const errorDiv = document.querySelector('#feedback');
-        errorDiv.textContent = message;
-        errorDiv.classList.add(type);
-       
-        setTimeout(function() {
-            errorDiv.textContent = '';
-            errorDiv.classList.remove(type);
-        }, 3000);
-    },
-
-    addEventListeners: () => {
-        const submitButton = document.getElementById('generate');
-        submitButton.addEventListener('click', (event) => {
-            
-            event.preventDefault();
-            
-            const selectors = octopus.getInputSelectors();
-            const inputs = view.getUserInputs(selectors, true);
-            
-            octopus.getWeatherData(
-                octopus.getWeatherPath() + '?zip=' + inputs.zip)
-                .then((weatherData) => {
-                    if(weatherData.error) {
-                        view.showFeedback(weatherData.error, 'error');
-                        return;
-                    }
-                    if (weatherData.cod === "404") {
-                        view.showFeedback(weatherData.message, 'error');
-                    }
-                    octopus.postData(octopus.getPostPath(), inputs)
-                        .then((data) => {
-                            view.updateUI(data);
-                        });
-                });
-        });
-    }
+function getc() {
+  const c = document.getElementById('zip');
+ 
+  return c.value
 }
 
-octopus.init();
+
+
+
+
+const w = async (url= '', zipCode = '') => {
+  const Wurl = url + "&zip=" + zipCode
+  const rt = await fetch(Wurl);
+  try {
+    const dataw = await rt.json();
+    return dataw;
+  }
+  catch(error) {
+   
+    console.log("error", error);
+  }
+}
+
+const dData = async ( url = '', data = {})=>{
+    const rd = await fetch(url, {
+      method: 'POST',
+      credentials: 'same-origin',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),       
+    });
+  
+    try {
+      const Datan = await rd.json();
+      return Datan;
+    }catch(error) {
+      console.log("error", error);
+    }
+  };
+function iuu(date, temperature, content) {
+
+  document.getElementById('pressure').innerText = date;
+  document.getElementById('temp').innerText = temperature;
+  document.getElementById('rh').innerText = content;
+}
+
+
+
+
+
+function getWeather(url='', zipCode='', userResponse='') {
+  w(url, zipCode)
+    .then(function(weatherofd={}) {
+    
+      const data = {
+        'temperature'   : weatherofd.main.temp,
+        'date'          : getCCD(),
+        'user_response' : getruu()
+      }
+      return data;
+    })
+    .then(function (data={}) {
+      console.log(data);
+      dData(BBUrl+'/', data);
+      return data;
+    })
+    .then(function (data={}) {
+      updateUI(data.date, data.temperature, data.user_response);
+    });
+}
+
+
+window.addEventListener('DOMContentLoaded', (event) => {
+  const temp = document.getElementById('generate');
+  console.log(temp);
+  temp.addEventListener("click", function() {
+    getWeather(URL, getc(), getruu());
+  });
+});
